@@ -1,0 +1,32 @@
+syntax="proto2";
+package PressureTest;
+
+option cc_generic_services = true;
+
+message PressureRequest {
+	required string message = 1;
+	required int32 int = 2;
+	required double double = 3;
+	required bool bool = 4;
+
+	repeated int32 array = 5 [packed=true];
+
+	message Map {
+		required string message = 1;
+		required bool bool = 2;
+		required int32 int = 3;
+		required double double = 4;
+		required string desc = 5;
+	};
+
+	required Map map = 6;
+};
+
+message PressureResponse {
+	required int32 count = 1;
+};
+
+
+service PressureService {
+  rpc pressure (PressureRequest) returns (PressureResponse);
+};

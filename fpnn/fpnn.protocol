@@ -1,0 +1,3 @@
+
+=> pressure { message:%s, int:%d, double:%f, bool:%b, array:[%d], map:{ message:%s, bool:%b, int:%d, double:%f, desc:%s } }
+<= { count:%d }
