@@ -36,7 +36,7 @@ void buildQuest(PressureTest::PressureRequest &request)
 	request.add_array(32);
 	request.add_array(4);
 
-	PressureTest::PressureRequest_Map* Map = mutable_map();
+	PressureTest::PressureRequest_Map* Map = request.mutable_map();
 
 	Map.set_message("first_map");
 	request.set_bool_(true);
@@ -50,22 +50,7 @@ class Tester;
 class OnRPCDone: public google::protobuf::Closure
 {
 public:
-	void Run()
-	{
-		int64_t recv_time = exact_real_usec();
-		int64_t diff = recv_time - send_time;
-
-		std::unique_ptr<OnRPCDone> self_guard(this);
-
-		if (cntl->Failed())
-		{
-			tester->incRecvError();
-			cout<<"RPC response error."<<endl;
-		}
-		
-		tester->incRecv();
-		tester->addTimecost(diff);
-	}
+	void Run();
 
 	PressureTest::PressureResponse response;
 	brpc::Controller cntl;
@@ -221,6 +206,23 @@ void Tester::test_worker(int qps)
 		if (real_usec > 0)
 			usleep(real_usec);
 	}
+}
+
+void OnRPCDone::Run()
+{
+	int64_t recv_time = exact_real_usec();
+	int64_t diff = recv_time - send_time;
+
+	std::unique_ptr<OnRPCDone> self_guard(this);
+
+	if (cntl->Failed())
+	{
+		tester->incRecvError();
+		cout<<"RPC response error."<<endl;
+	}
+	
+	tester->incRecv();
+	tester->addTimecost(diff);
 }
 
 int main(int argc, char* argv[])
