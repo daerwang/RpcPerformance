@@ -29,6 +29,18 @@ FPQuestPtr buildQuest()
 	return qw.take();
 }
 
+class Tester;
+
+class PressureCallback: public AnswerCallback
+{
+public:
+	virtual void onAnswer(FPAnswerPtr);
+	virtual void onException(FPAnswerPtr answer, int errorCode);
+
+	int64_t send_time;
+	Tester* tester;
+};
+
 class Tester
 {
 	std::string _ip;
@@ -145,40 +157,39 @@ void Tester::test_worker(int qps)
 	while (true)
 	{
 		int64_t begin_time = exact_real_usec();
+
+		PressureCallback* callback = new PressureCallback;
 		FPQuestPtr quest = buildQuest();
-		int64_t send_time = exact_real_usec();
-		try{
-			client->sendQuest(quest, [send_time, ins](FPAnswerPtr answer, int errorCode)
-				{
-					int64_t recv_time = exact_real_usec();
-					int64_t diff = recv_time - send_time;
 
-					if (errorCode != FPNN_EC_OK)
-					{
-						ins->incRecvError();
-						if (errorCode == FPNN_EC_CORE_TIMEOUT)
-							cout<<"Timeouted occurred when recving."<<endl;
-						else
-							cout<<"error occurred when recving."<<endl;
-						return;
-					}
+		callback->tester = this;
+		callback->send_time = exact_real_usec();
 
-					ins->incRecv();
-					ins->addTimecost(diff);
-				});
-			_send++;
-		}
-		catch (...)
-		{
-			_sendError++;
-			cerr<<"error occurred when sending"<<endl;
-		}
+		client->sendQuest(quest, callback);
+		_send++;
 
 		int64_t sent_time = exact_real_usec();
 		int64_t real_usec = usec - (sent_time - begin_time);
 		if (real_usec > 0)
 			usleep(real_usec);
 	}
+}
+
+void PressureCallback::onAnswer(FPAnswerPtr answer)
+{
+	int64_t recv_time = exact_real_usec();
+	int64_t diff = recv_time - send_time;
+	
+	tester->incRecv();
+	tester->addTimecost(diff);
+}
+
+void PressureCallback::onException(FPAnswerPtr answer, int errorCode)
+{
+	tester->incRecvError();
+	if (errorCode == FPNN_EC_CORE_TIMEOUT)
+		cout<<"Timeouted occurred when recving."<<endl;
+	else
+		cout<<"error occurred when recving."<<endl;
 }
 
 int main(int argc, char* argv[])

@@ -218,6 +218,7 @@ void OnRPCDone::Run()
 	{
 		tester->incRecvError();
 		cout<<"RPC response error."<<endl;
+		return;
 	}
 	
 	tester->incRecv();
