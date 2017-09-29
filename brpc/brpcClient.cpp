@@ -1,4 +1,4 @@
-
+#include <thread>
 #include <iostream>
 #include <gflags/gflags.h>
 #include <butil/logging.h>
@@ -38,11 +38,11 @@ void buildQuest(PressureTest::PressureRequest &request)
 
 	PressureTest::PressureRequest_Map* Map = request.mutable_map();
 
-	Map.set_message("first_map");
-	request.set_bool_(true);
-	Map.set_int_(5);
-	Map.set_double_(5.7);
-	Map.set_desc("中文");
+	Map->set_message("first_map");
+	Map->set_bool_(true);
+	Map->set_int_(5);
+	Map->set_double_(5.7);
+	Map->set_desc("中文");
 }
 
 class Tester;
@@ -164,7 +164,6 @@ public:
 void Tester::test_worker(int qps)
 {
 	int usec = 1000 * 1000 / qps;
-	Tester* ins = this;
 
 	cout<<"-- qps: "<<qps<<", interval usec: "<<usec<<endl;
 
@@ -215,7 +214,7 @@ void OnRPCDone::Run()
 
 	std::unique_ptr<OnRPCDone> self_guard(this);
 
-	if (cntl->Failed())
+	if (cntl.Failed())
 	{
 		tester->incRecvError();
 		cout<<"RPC response error."<<endl;
