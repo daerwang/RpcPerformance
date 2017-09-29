@@ -10,12 +10,17 @@ class PressureQuestProcessor: public IQuestProcessor
 	QuestProcessorClassPrivateFields(PressureQuestProcessor)
 
 public:
+	PressureQuestProcessor()
+	{
+		registerMethod("pressure", &PressureQuestProcessor::pressure);
+	}
+
 	FPAnswerPtr pressure(const FPReaderPtr args, const FPQuestPtr quest, const ConnectionInfo& ci)
 	{
 		int count = args->wantInt("int");
 		std::vector<int> array = args->want("array", std::vector<int>());
 		OBJECT obj = args->wantObject("map");
-		
+
 		FPReader reader(obj);
 		count += reader.wantInt("int");
 
