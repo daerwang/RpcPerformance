@@ -148,7 +148,6 @@ public:
 void Tester::test_worker(int qps)
 {
 	int usec = 1000 * 1000 / qps;
-	Tester* ins = this;
 
 	cout<<"-- qps: "<<qps<<", interval usec: "<<usec<<endl;
 
