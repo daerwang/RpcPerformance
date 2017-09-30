@@ -173,6 +173,7 @@ void Tester::test_worker(int qps)
 	options.protocol = FLAGS_protocol;
 	options.connection_type = FLAGS_connection_type;
 	options.timeout_ms = FLAGS_timeout_ms;
+	options.connect_timeout_ms = 5000;
 	options.max_retry = FLAGS_max_retry;
 	if (channel.Init(FLAGS_server.c_str(), FLAGS_load_balancer.c_str(), &options) != 0)
 	{
