@@ -132,12 +132,13 @@ public:
 
 			int64_t real_time = ent - start;
 
+			if (dr)
+				dtc = dtc / dr;
+
 			ds = ds * 1000 * 1000 / real_time;
 			dr = dr * 1000 * 1000 / real_time;
 			//dse = dse * 1000 * 1000 / real_time;
 			//dre = dre * 1000 * 1000 / real_time;
-			if (dr)
-				dtc = dtc / dr;
 
 			cout<<"time interval: "<<(real_time / 1000.0)<<" ms, send error: "<<dse<<", recv error: "<<dre<<endl;
 			cout<<"[QPS] send: "<<ds<<", recv: "<<dr<<", per quest time cost: "<<dtc<<" usec"<<endl;
